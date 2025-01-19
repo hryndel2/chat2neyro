@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat with Neural Networks</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -30,125 +29,258 @@
         <div class="p-4 flex-grow overflow-y-auto" id="chat-window">
             <!-- Chat messages will be appended here -->
         </div>
-        <div class="p-4 bg- gray-200 dark:bg-gray-700 flex items-center">
-            <input type="text" id="message-input" class="flex-grow p-2 border rounded" placeholder="Type your message...">
-            <button id="send-message" class="ml-2 bg-blue-500 text-white p-2 rounded">Send</button>
+        <div class="p-4 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-b-lg flex items-center sticky bottom-0 z-10">
+            <input id="user-input" type="text" class="flex-grow p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white" placeholder="Type your message...">
+            <button id="send-button" class="ml-4 bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-700 dark:to-purple-700 text-white p-2 rounded-lg hover:from-blue-600 hover:to-purple-600 dark:hover:from-blue-800 dark:hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     </div>
-    <div class="p-4">
-        <label for="gradient-toggle" class="flex items-center">
-            <input type="checkbox" id="gradient-toggle" class="mr-2"> Enable Gradient
-        </label>
-        <div class="flex items-center">
-            <input type="color" id="color-picker-input" class="mr-2">
-            <button id="add-gradient-color" class="bg-green-500 text-white p-2 rounded">Add Color</button>
-            <button id="remove-gradient-color" class="bg-red-500 text-white p-2 rounded ml-2">Remove Color</button>
-            <button id="reset-gradient-colors" class="bg-yellow-500 text-white p-2 rounded ml-2">Reset Colors</button>
-        </div>
-        <div id="bot1-settings" class="mt-4">
-            <h2 class="font-bold">Bot 1 Color Picker</h2>
-            <div class="color-picker" data-color="red" style="background-color: red; width: 30px; height: 30px; cursor: pointer;"></div>
-            <div class="color-picker" data-color="blue" style="background-color: blue; width: 30px; height: 30px; cursor: pointer;"></div>
-            <div class="color-picker" data-color="green" style="background-color: green; width: 30px; height: 30px; cursor: pointer;"></div>
-        </div>
-        <div id="bot2-settings" class="mt-4">
-            <h2 class="font-bold">Bot 2 Color Picker</h2>
-            <div class="color-picker" data-color="purple" style="background-color: purple; width: 30px; height: 30px; cursor: pointer;"></div>
-            <div class="color-picker" data-color="orange" style="background-color: orange; width: 30px; height: 30px; cursor: pointer;"></div>
-            <div class="color-picker" data-color="yellow" style="background-color: yellow; width: 30px; height: 30px; cursor: pointer;"></div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-2xl">
+            <div class="flex justify-center mb-4 space-x-4">
+                <button id="bot1-settings" class="text-blue-500 dark:text-blue-300 font-bold hover:text-blue-700 dark:hover:text-blue-500 active">Bot 1</button>
+                <button id="bot2-settings" class="text-blue-500 dark:text-blue-300 font-bold hover:text-blue-700 dark:hover:text-blue-500">Bot 2</button>
+            </div>
+            <hr class="border-gray-300 dark:border-gray-600 mb-4">
+            <div id="bot1-settings-content" class="settings-content">
+                <div class="mb-4">
+                    <label for="bot1-name" class="block text-gray-700 dark:text-gray-300">Bot 1 Name</label>
+                    <input id="bot1-name" type="text" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white" value="NeuralNet1">
+                </div>
+                <div class="mb-4">
+                    <label for="bot1-prompt" class="block text-gray-700 dark:text-gray-300">Bot 1 Prompt</label>
+                    <textarea id="bot1-prompt" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">This is a simulated response from Neural Network 1.</textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="bot1-bg-color" class="block text-gray-700 dark:text-gray-300">Bot 1 Background Color</label>
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" id="bot1-gradient-toggle" class="mr-2">
+                        <label for="bot1-gradient-toggle" class="text-gray-700 dark:text-gray-300">Enable Gradient</label>
+                    </div>
+                    <div id="bot1-gradient-settings" class="hidden">
+                        <div class="flex items-center mb-2">
+                            <input type="color" id="bot1-gradient-color1" class="mr-2">
+                            <input type="color" id="bot1-gradient-color2" class="mr-2">
+                            <button id="bot1-add-gradient-color" class="bg-blue-500 text-white p-1 rounded">+</button>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <label for="bot1-gradient-direction" class="text-gray-700 dark:text-gray-300 mr-2">Direction</label>
+                            <select id="bot1-gradient-direction" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">
+                                <option value="to-r">To Right</option>
+                                <option value="to-l">To Left</option>
+                                <option value="to-t">To Top</option>
+                                <option value="to-b">To Bottom</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="bot1-solid-color-settings">
+                        <input type="color" id="bot1-solid-color" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="bot1-text-color" class="block text-gray-700 dark:text-gray-300">Bot 1 Text Color</label>
+                    <input type="color" id="bot1-text-color" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white" value="#ffffff">
+                </div>
+            </div>
+            <div id="bot2-settings-content" class="settings-content hidden">
+                <div class="mb-4">
+                    <label for="bot2-name" class="block text-gray-700 dark:text-gray-300">Bot 2 Name</label>
+                    <input id="bot2-name" type="text" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white" value="NeuralNet2">
+                </div>
+                <div class="mb-4">
+                    <label for="bot2-prompt" class="block text-gray-700 dark:text-gray-300">Bot 2 Prompt</label>
+                    <textarea id="bot2-prompt" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">This is a simulated response from Neural Network 2.</textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="bot2-bg-color" class="block text-gray-700 dark:text-gray-300">Bot 2 Background Color</label>
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" id="bot2-gradient-toggle" class="mr-2">
+                        <label for="bot2-gradient-toggle" class="text-gray-700 dark:text-gray-300">Enable Gradient</label>
+                    </div>
+                    <div id="bot2-gradient-settings" class="hidden">
+                        <div class="flex items-center mb-2">
+                            <input type="color" id="bot2-gradient-color1" class="mr-2">
+                            <input type="color" id="bot2-gradient-color2" class="mr-2">
+                            <button id="bot2-add-gradient-color" class="bg-blue-500 text-white p-1 rounded">+</button>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <label for="bot2-gradient-direction" class="text-gray-700 dark:text-gray-300 mr-2">Direction</label>
+                            <select id="bot2-gradient-direction" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">
+                                <option value="to-r">To Right</option>
+                                <option value="to-l">To Left</option>
+                                <option value="to-t">To Top</option>
+                                <option value="to-b">To Bottom</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="bot2-solid-color-settings">
+                        <input type="color" id="bot2-solid-color" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="bot2-text-color" class="block text-gray-700 dark:text-gray-300">Bot 2 Text Color</label>
+                    <input type="color" id="bot2-text-color" class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white" value="#ffffff">
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button id="save-settings" class="bg-blue-500 dark:bg-blue-700 text-white p-2 rounded-lg mr-2">Save</button>
+                <button id="close-settings" class="bg-gray-500 dark:bg-gray-700 text-white p-2 rounded-lg">Close</button>
+            </div>
         </div>
     </div>
+
     <script>
         const chatWindow = document.getElementById('chat-window');
-const userInput = document.getElementById('user-input');
-const sendButton = document.getElementById('send-button');
-const themeToggle = document.getElementById('theme-toggle');
-const settingsIcon = document.getElementById('settings-icon');
-const settingsModal = document.getElementById('settings-modal');
-const closeSettings = document.getElementById('close-settings');
-const saveSettings = document.getElementById('save-settings');
-const bot1SettingsButton = document.getElementById('bot1-settings');
-const bot2SettingsButton = document.getElementById('bot2-settings');
-const bot1SettingsContent = document.getElementById('bot1-settings-content');
-const bot2SettingsContent = document.getElementById('bot2-settings-content');
-const body = document.body;
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const themeToggle = document.getElementById('theme-toggle');
+        const settingsIcon = document.getElementById('settings-icon');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettings = document.getElementById('close-settings');
+        const saveSettings = document.getElementById('save-settings');
+        const bot1SettingsButton = document.getElementById('bot1-settings');
+        const bot2SettingsButton = document.getElementById('bot2-settings');
+        const bot1SettingsContent = document.getElementById('bot1-settings-content');
+        const bot2SettingsContent = document.getElementById('bot2-settings-content');
+        const bot1GradientToggle = document.getElementById('bot1-gradient-toggle');
+        const bot2GradientToggle = document.getElementById('bot2-gradient-toggle');
+        const bot1GradientSettings = document.getElementById('bot1-gradient-settings');
+        const bot2GradientSettings = document.getElementById('bot2-gradient-settings');
+        const bot1SolidColorSettings = document.getElementById('bot1-solid-color-settings');
+        const bot2SolidColorSettings = document.getElementById('bot2-solid-color-settings');
+        const body = document.body;
 
-let bot1Name = 'NeuralNet1';
-let bot2Name = 'NeuralNet2';
-let bot1Prompt = 'This is a simulated response from Neural Network 1.';
-let bot2Prompt = 'This is a simulated response from Neural Network 2.';
-let bot1BgColor = 'from-blue-500 to-purple-500';
-let bot2BgColor = 'from-blue-500 to-purple-500';
-let bot1TextColor = 'text-white';
-let bot2TextColor = 'text-white';
+        let bot1Name = 'NeuralNet1';
+        let bot2Name = 'NeuralNet2';
+        let bot1Prompt = 'This is a simulated response from Neural Network 1.';
+        let bot2Prompt = 'This is a simulated response from Neural Network 2.';
+        let bot1BgColor = 'from-blue-500 to-purple-500';
+        let bot2BgColor = 'from-green-500 to-yellow-500';
+        let bot1TextColor = 'text-white';
+        let bot2TextColor = 'text-white';
 
-sendButton.addEventListener('click', () => {
-    const userMessage = userInput.value.trim();
-    if (userMessage) {
-        appendMessage('user', 'User', userMessage);
-        userInput.value = '';
-        // Simulate neural network responses
-        setTimeout(() => {
-            appendMessage('neural1', bot1Name, bot1Prompt, bot1BgColor, bot1TextColor);
-        }, 1000);
-        setTimeout(() => {
-            appendMessage('neural2', bot2Name, bot2Prompt, bot2BgColor, bot2TextColor);
-        }, 2000);
-    }
-});
+        sendButton.addEventListener('click', () => {
+            const userMessage = userInput.value.trim();
+            if (userMessage) {
+                appendMessage('user', 'User', userMessage);
+                userInput.value = '';
+                // Simulate neural network responses
+                setTimeout(() => {
+                    appendMessage('neural1', bot1Name, bot1Prompt, bot1BgColor, bot1TextColor);
+                }, 1000);
+                setTimeout(() => {
+                    appendMessage('neural2', bot2Name, bot2Prompt, bot2BgColor, bot2TextColor);
+                }, 2000);
+            }
+        });
 
-themeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark');
-    themeToggle.innerHTML = body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-});
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            themeToggle.innerHTML = body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
 
-function appendMessage(type, name, message, bgColor = '', textColor = '') {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `p-2 my-2 rounded-lg ${bgColor} ${textColor} ${type === 'user' ? 'text-right' : 'text-left'}`;
-    messageDiv.innerHTML = `<strong>${name}:</strong> ${message}`;
-    chatWindow.appendChild(messageDiv);
-    chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
-}
+        settingsIcon.addEventListener('click', () => {
+            settingsModal.classList.remove('hidden');
+        });
 
-const gradientColors = [];
+        closeSettings.addEventListener('click', () => {
+            settingsModal.classList.add('hidden');
+        });
 
-document.getElementById('add-gradient-color').addEventListener('click', () => {
-    const color = document.getElementById('color-picker-input').value;
-    if (color && !gradientColors.includes(color)) {
-        gradientColors.push(color);
-        updateGradient();
-    }
-});
+        saveSettings.addEventListener('click', () => {
+            bot1Name = document.getElementById('bot1-name').value || 'NeuralNet1';
+            bot2Name = document.getElementById('bot2-name').value || 'NeuralNet2';
+            bot1Prompt = document.getElementById('bot1-prompt').value || 'This is a simulated response from Neural Network 1.';
+            bot2Prompt = document.getElementById('bot2-prompt').value || 'This is a simulated response from Neural Network 2.';
+            if (bot1GradientToggle.checked) {
+                const color1 = document.getElementById('bot1-gradient-color1').value;
+                const color2 = document.getElementById('bot1-gradient-color2').value;
+                const direction = document.getElementById('bot1-gradient-direction').value;
+                bot1BgColor = `from-${color1} to-${color2} ${direction}`;
+            } else {
+                bot1BgColor = document.getElementById('bot1-solid-color').value;
+            }
+            if (bot2GradientToggle.checked) {
+                const color1 = document.getElementById('bot2-gradient-color1').value;
+                const color2 = document.getElementById('bot2-gradient-color2').value;
+                const direction = document.getElementById('bot2-gradient-direction').value;
+                bot2BgColor = `from-${color1} to-${color2} ${direction}`;
+            } else {
+                bot2BgColor = document.getElementById('bot2-solid-color').value;
+            }
+            bot1TextColor = document.getElementById('bot1-text-color').value || 'text-white';
+            bot2TextColor = document.getElementById('bot2-text-color').value || 'text-white';
+            settingsModal.classList.add('hidden');
+        });
 
-document.getElementById('remove-gradient-color').addEventListener('click', () => {
-    const color = document.getElementById('color-picker-input').value;
-    const index = gradientColors.indexOf(color);
-    if (index > -1) {
-        gradientColors.splice(index, 1);
-        updateGradient();
-    }
-});
+        bot1SettingsButton.addEventListener('click', () => {
+            bot1SettingsContent.classList.remove('hidden');
+            bot2SettingsContent.classList.add('hidden');
+            bot1SettingsButton.classList.add('active');
+            bot2SettingsButton.classList.remove('active');
+        });
 
-function updateGradient() {
-    if (gradientColors.length > 0) {
-        chatWindow.style.background = `linear-gradient(to right, ${gradientColors.map(color => `from-${color}-500`).join(', ')})`;
-    } else {
-        chatWindow.style.background = '';
-    }
-}
+        bot2SettingsButton.addEventListener('click', () => {
+            bot1SettingsContent.classList.add('hidden');
+            bot2SettingsContent.classList.remove('hidden');
+            bot1SettingsButton.classList.remove('active');
+            bot2SettingsButton.classList.add('active');
+        });
 
-closeSettings.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
-});
+        bot1GradientToggle.addEventListener('change', () => {
+            if (bot1GradientToggle.checked) {
+                bot1GradientSettings.classList.remove('hidden');
+                bot1SolidColorSettings.classList.add('hidden');
+            } else {
+                bot1GradientSettings.classList.add('hidden');
+                bot1SolidColorSettings.classList.remove('hidden');
+            }
+        });
 
-saveSettings.addEventListener('click', () => {
-    // Logic to save settings, e.g., localStorage
-    localStorage.setItem('bot1Name', bot1Name);
-    localStorage.setItem('bot2Name', bot2Name);
-    localStorage.setItem('bot1BgColor', bot1BgColor);
-    localStorage.setItem('bot2BgColor', bot2BgColor);
-    localStorage.setItem('gradientColors', JSON.stringify(gradientColors));
-});
+        bot2GradientToggle.addEventListener('change', () => {
+            if (bot2GradientToggle.checked) {
+                bot2GradientSettings.classList.remove('hidden');
+                bot2SolidColorSettings.classList.add('hidden');
+            } else {
+                bot2GradientSettings.classList.add('hidden');
+                bot2SolidColorSettings.classList.remove('hidden');
+            }
+        });
+
+        function appendMessage(sender, nickname, message, bgColor = '', textColor = '') {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('p-2', 'my-2', 'rounded-lg', 'max-w-xs', 'break-words');
+            const nicknameElement = document.createElement('div');
+            nicknameElement.classList.add('font-bold', 'mb-1');
+
+            if (sender === 'user') {
+                messageElement.classList.add('bg-green-500', 'dark:bg-green-700', 'text-white', 'self-end', 'ml-auto');
+                nicknameElement.classList.add('text-green-200');
+            } else if (sender === 'neural1') {
+                if (bgColor.includes('from-')) {
+                    messageElement.classList.add('bg-gradient-to-r', ...bgColor.split(' '), textColor, 'self-start', 'mr-auto');
+                } else {
+                    messageElement.classList.add(bgColor, textColor, 'self-start', 'mr-auto');
+                }
+                nicknameElement.classList.add('text-blue-200');
+            } else if (sender === 'neural2') {
+                if (bgColor.includes('from-')) {
+                    messageElement.classList.add('bg-gradient-to-r', ...bgColor.split(' '), textColor, 'self-start', 'mr-auto');
+                } else {
+                    messageElement.classList.add(bgColor, textColor, 'self-start', 'mr-auto');
+                }
+                nicknameElement.classList.add('text-purple-200');
+            }
+
+            nicknameElement.textContent = nickname;
+            messageElement.appendChild(nicknameElement);
+            messageElement.appendChild(document.createTextNode(message));
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
     </script>
 </body>
 </html>
