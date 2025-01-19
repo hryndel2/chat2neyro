@@ -1,3 +1,4 @@
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,11 +62,11 @@
                         <label for="bot1-gradient-toggle" class="text-gray-700 dark:text-gray-300">Enable Gradient</label>
                     </div>
                     <div id="bot1-gradient-settings" class="hidden">
-                        <div class="flex items-center mb-2">
-                            <input type="color" id="bot1-gradient-color1" class="mr-2">
-                            <input type="color" id="bot1-gradient-color2" class="mr-2">
-                            <button id="bot1-add-gradient-color" class="bg-blue-500 text-white p-1 rounded">+</button>
+                        <div id="bot1-gradient-colors" class="flex items-center mb-2">
+                            <input type="color" class="mr-2 gradient-color">
+                            <input type="color" class="mr-2 gradient-color">
                         </div>
+                        <button id="bot1-add-gradient-color" class="bg-blue-500 text-white p-1 rounded mb-2">+</button>
                         <div class="flex items-center mb-2">
                             <label for="bot1-gradient-direction" class="text-gray-700 dark:text-gray-300 mr-2">Direction</label>
                             <select id="bot1-gradient-direction" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">
@@ -101,11 +102,11 @@
                         <label for="bot2-gradient-toggle" class="text-gray-700 dark:text-gray-300">Enable Gradient</label>
                     </div>
                     <div id="bot2-gradient-settings" class="hidden">
-                        <div class="flex items-center mb-2">
-                            <input type="color" id="bot2-gradient-color1" class="mr-2">
-                            <input type="color" id="bot2-gradient-color2" class="mr-2">
-                            <button id="bot2-add-gradient-color" class="bg-blue-500 text-white p-1 rounded">+</button>
+                        <div id="bot2-gradient-colors" class="flex items-center mb-2">
+                            <input type="color" class="mr-2 gradient-color">
+                            <input type="color" class="mr-2 gradient-color">
                         </div>
+                        <button id="bot2-add-gradient-color" class="bg-blue-500 text-white p-1 rounded mb-2">+</button>
                         <div class="flex items-center mb-2">
                             <label for="bot2-gradient-direction" class="text-gray-700 dark:text-gray-300 mr-2">Direction</label>
                             <select id="bot2-gradient-direction" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white">
@@ -151,6 +152,8 @@
         const bot2GradientSettings = document.getElementById('bot2-gradient-settings');
         const bot1SolidColorSettings = document.getElementById('bot1-solid-color-settings');
         const bot2SolidColorSettings = document.getElementById('bot2-solid-color-settings');
+        const bot1GradientColors = document.getElementById('bot1-gradient-colors');
+        const bot2GradientColors = document.getElementById('bot2-gradient-colors');
         const body = document.body;
 
         let bot1Name = 'NeuralNet1';
@@ -196,23 +199,21 @@
             bot1Prompt = document.getElementById('bot1-prompt').value || 'This is a simulated response from Neural Network 1.';
             bot2Prompt = document.getElementById('bot2-prompt').value || 'This is a simulated response from Neural Network 2.';
             if (bot1GradientToggle.checked) {
-                const color1 = document.getElementById('bot1-gradient-color1').value;
-                const color2 = document.getElementById('bot1-gradient-color2').value;
+                const colors = Array.from(bot1GradientColors.querySelectorAll('.gradient-color')).map(input => input.value);
                 const direction = document.getElementById('bot1-gradient-direction').value;
-                bot1BgColor = `from-${color1} to-${color2} ${direction}`;
+                bot1BgColor = `bg-gradient-to-${direction} ${colors.map(color => `from-[${color}]`).join(' ')}`;
             } else {
-                bot1BgColor = document.getElementById('bot1-solid-color').value;
+                bot1BgColor = `bg-[${document.getElementById('bot1-solid-color').value}]`;
             }
             if (bot2GradientToggle.checked) {
-                const color1 = document.getElementById('bot2-gradient-color1').value;
-                const color2 = document.getElementById('bot2-gradient-color2').value;
+                const colors = Array.from(bot2GradientColors.querySelectorAll('.gradient-color')).map(input => input.value);
                 const direction = document.getElementById('bot2-gradient-direction').value;
-                bot2BgColor = `from-${color1} to-${color2} ${direction}`;
+                bot2BgColor = `bg-gradient-to-${direction} ${colors.map(color => `from-[${color}]`).join(' ')}`;
             } else {
-                bot2BgColor = document.getElementById('bot2-solid-color').value;
+                bot2BgColor = `bg-[${document.getElementById('bot2-solid-color').value}]`;
             }
-            bot1TextColor = document.getElementById('bot1-text-color').value || 'text-white';
-            bot2TextColor = document.getElementById('bot2-text-color').value || 'text-white';
+            bot1TextColor = `text-[${document.getElementById('bot1-text-color').value}]` || 'text-white';
+            bot2TextColor = `text-[${document.getElementById('bot2-text-color').value}]` || 'text-white';
             settingsModal.classList.add('hidden');
         });
 
@@ -250,6 +251,20 @@
             }
         });
 
+        document.getElementById('bot1-add-gradient-color').addEventListener('click', () => {
+            const newColorInput = document.createElement('input');
+            newColorInput.type = 'color';
+            newColorInput.classList.add('mr-2', 'gradient-color');
+            bot1GradientColors.appendChild(newColorInput);
+        });
+
+        document.getElementById('bot2-add-gradient-color').addEventListener('click', () => {
+            const newColorInput = document.createElement('input');
+            newColorInput.type = 'color';
+            newColorInput.classList.add('mr-2', 'gradient-color');
+            bot2GradientColors.appendChild(newColorInput);
+        });
+
         function appendMessage(sender, nickname, message, bgColor = '', textColor = '') {
             const messageElement = document.createElement('div');
             messageElement.classList.add('p-2', 'my-2', 'rounded-lg', 'max-w-xs', 'break-words');
@@ -260,19 +275,17 @@
                 messageElement.classList.add('bg-green-500', 'dark:bg-green-700', 'text-white', 'self-end', 'ml-auto');
                 nicknameElement.classList.add('text-green-200');
             } else if (sender === 'neural1') {
-                if (bgColor.includes('from-')) {
-                    messageElement.classList.add('bg-gradient-to-r', ...bgColor.split(' '), textColor, 'self-start', 'mr-auto');
-                } else {
-                    messageElement.classList.add(bgColor, textColor, 'self-start', 'mr-auto');
-                }
+                if (bgColor.includes('bg
+                messageElement.classList.add(textColor.replace('text-[', '').replace(']', ''));
                 nicknameElement.classList.add('text-blue-200');
             } else if (sender === 'neural2') {
-                if (bgColor.includes('from-')) {
-                    messageElement.classList.add('bg-gradient-to-r', ...bgColor.split(' '), textColor, 'self-start', 'mr-auto');
+                if (bgColor.includes('bg-gradient')) {
+                    messageElement.classList.add(...bgColor.split(' '));
                 } else {
-                    messageElement.classList.add(bgColor, textColor, 'self-start', 'mr-auto');
+                    messageElement.style.backgroundColor = bgColor.replace('bg-[', '').replace(']', '');
                 }
-                nicknameElement.classList.add('text-purple-200');
+                messageElement.classList.add(textColor.replace('text-[', '').replace(']', ''));
+                nicknameElement.classList.add('text-yellow-200');
             }
 
             nicknameElement.textContent = nickname;
